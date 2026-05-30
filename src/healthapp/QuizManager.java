@@ -401,118 +401,19 @@ public class QuizManager extends JPanel {
         }
     }
 
-    // Displays the final quiz result and motivational message
+    // Displays the final quiz result using RewardSystem (Member 3)
     private void showResult() {
         removeAll();
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
-        // Header
-        JPanel header = new JPanel();
-        header.setBackground(PRIMARY_COLOR);
-        header.setBorder(BorderFactory.createEmptyBorder(12, 15, 12, 15));
-        JLabel hLbl = new JLabel("SDG 3: Good Health & Well-being  |  Quiz Results");
-        hLbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        hLbl.setForeground(Color.WHITE);
-        header.add(hLbl);
-        add(header, BorderLayout.NORTH);
-
-        // Result card
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(new CompoundBorder(
-            new LineBorder(CARD_BORDER, 2, true),
-            BorderFactory.createEmptyBorder(30, 30, 30, 30)
-        ));
-
-        double pct = (double) score / questions.size() * 100;
-        String message = getMotivationalMessage(pct);
-        Color  msgColor = getMessageColor(pct);
-
-        JLabel scoreLbl = new JLabel(
-            "Your Score: " + score + " / " + questions.size(),
-            SwingConstants.CENTER);
-        scoreLbl.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        scoreLbl.setForeground(PRIMARY_COLOR);
-        scoreLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel pctLbl = new JLabel(
-            String.format("%.0f%%", pct),
-            SwingConstants.CENTER);
-        pctLbl.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        pctLbl.setForeground(msgColor);
-        pctLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JSeparator sep = new JSeparator();
-        sep.setMaximumSize(new Dimension(300, 2));
-        sep.setForeground(CARD_BORDER);
-
-        JLabel msgLbl = new JLabel(message, SwingConstants.CENTER);
-        msgLbl.setFont(new Font("Segoe UI", Font.ITALIC, 18));
-        msgLbl.setForeground(msgColor);
-        msgLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JLabel userLbl = new JLabel(
-            "Well done, " + userProfile.getUsername() + "!",
-            SwingConstants.CENTER);
-        userLbl.setFont(SMALL_FONT);
-        userLbl.setForeground(new Color(120, 160, 130));
-        userLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        card.add(Box.createVerticalStrut(14));
-        card.add(scoreLbl);
-        card.add(Box.createVerticalStrut(6));
-        card.add(pctLbl);
-        card.add(Box.createVerticalStrut(16));
-        card.add(sep);
-        card.add(Box.createVerticalStrut(16));
-        card.add(msgLbl);
-        card.add(Box.createVerticalStrut(8));
-        card.add(userLbl);
-        card.add(Box.createVerticalStrut(10));
-
-        JPanel wrap = new JPanel(new BorderLayout());
-        wrap.setBackground(BG_COLOR);
-        wrap.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 10));
-        wrap.add(card, BorderLayout.CENTER);
-        add(wrap, BorderLayout.CENTER);
-
-        // SDG reminder at bottom
-        JLabel sdgLbl = new JLabel(
-            "<html><center>Keep learning about SDG 3 to help build a healthier world! 🌍</center></html>",
-            SwingConstants.CENTER);
-        sdgLbl.setFont(SMALL_FONT);
-        sdgLbl.setForeground(new Color(80, 80, 130));
-        sdgLbl.setBorder(new CompoundBorder(
-            new LineBorder(new Color(220, 220, 250), 1, true),
-            BorderFactory.createEmptyBorder(8, 14, 8, 14)
-        ));
-
-        JPanel foot = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        foot.setBackground(BG_COLOR);
-        foot.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-        foot.add(sdgLbl);
-        add(foot, BorderLayout.SOUTH);
+        // ── Hand off to Member 3's RewardSystem ──────────────
+        // RewardSystem handles: badge, stars, points, leaderboard, file save
+        RewardSystem rewardPanel = new RewardSystem(userProfile, score, questions.size());
+        add(rewardPanel, BorderLayout.CENTER);
 
         revalidate();
         repaint();
     }
 
-    // Returns a motivational message based on score percentage
-    private String getMotivationalMessage(double pct) {
-        if (pct >= 80) return "Outstanding!";
-        if (pct >= 60) return "That's good!";
-        if (pct >= 40) return "Good try!";
-        if (pct >= 20) return "You can do better!";
-        return "Don't give up!";
-    }
-
-    private Color getMessageColor(double pct) {
-        if (pct >= 80) return new Color(34, 139, 87);
-        if (pct >= 60) return new Color(0, 150, 136);
-        if (pct >= 40) return new Color(255, 152, 0);
-        if (pct >= 20) return new Color(244, 81, 30);
-        return new Color(183, 28, 28);
-    }
 }
