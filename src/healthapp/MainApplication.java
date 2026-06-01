@@ -209,19 +209,38 @@ public class MainApplication extends JFrame implements UserInteraction {
         textArea.setMargin(new Insets(10, 10, 10, 10));
 
         try (BufferedReader reader = new BufferedReader(new FileReader("../scores.txt"))) {
-            StringBuilder sb = new StringBuilder(String.format("%-20s %s\n", "Name", "Score"));
-            sb.append("----------------------------------\n");
+            StringBuilder sb = new StringBuilder(
+                String.format("%-6s %-20s %-8s %-16s\n",
+                    "Rank", "Name", "Score", "Date")
+            );
+
+            sb.append("------------------------------------------------------------\n");
+
             String line;
             boolean hasScores = false;
+            int rank = 1;
+
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 2) {
-                    sb.append(String.format("%-20s %s%%\n", parts[0].trim(), parts[1].trim()));
+
+                if (parts.length >= 3) {
+                    sb.append(String.format(
+                        "%-6d %-20s %-8s %-16s\n",
+                        rank++,
+                        parts[0].trim(),
+                        parts[1].trim() + "%",
+                        parts[2].trim()
+                    ));
                     hasScores = true;
                 }
             }
-            if (!hasScores) sb.append("\nNo scores recorded yet.");
+
+            if (!hasScores) {
+                sb.append("\nNo scores recorded yet.");
+            }
+
             textArea.setText(sb.toString());
+
         } catch (Exception ex) {
             textArea.setText("\nNo scores recorded yet, or file not found.");
         }
