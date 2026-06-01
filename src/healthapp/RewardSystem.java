@@ -2,8 +2,7 @@ package healthapp;
 
 // ============================================================
 // Class      : RewardSystem
-// Creator    : Member 3
-// Tester     : Member 2
+// Creator    : Jocelyn (104561)
 // OOP        : File I/O, Method Overloading, Exception Handling,
 //              Interface Implementation (ScoreStorage)
 // Description: Handles gamification (badges, points, stars),
