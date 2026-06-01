@@ -61,12 +61,12 @@ public class RewardSystem extends JPanel implements ScoreStorage {
         setBackground(BG_COLOR);
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        // Save score first so leaderboard includes the current result
+        saveScore(username, score);
+
         buildHeader();
         buildResultCard();
         buildLeaderboardPanel();
-
-        // Auto-save score when panel is created
-        saveScore(username, score);
     }
 
     // ── Build top header bar ──────────────────────────────────
@@ -98,25 +98,25 @@ public class RewardSystem extends JPanel implements ScoreStorage {
             "Score: " + rawScore + " / " + totalQ + "  (" + score + "%)",
             new Font("Segoe UI", Font.BOLD, 22), PRIMARY_COLOR);
 
-        // Badge
+        // Badge — emoji font covers the badge icon and text
         lblBadge = makeCenter(determineBadge(score),
             new Font("Segoe UI Emoji", Font.PLAIN, 15), TEXT_COLOR);
 
-        // Stars
-        lblStars = makeCenter("⭐ " + getStarString(calculateStars(score)),
-            new Font("Segoe UI Emoji", Font.PLAIN, 22), ACCENT_COLOR);
+        // Stars — HTML label: gold ★ for earned, grey ★ for remaining (avoids ☆ rendering issue)
+        lblStars = makeCenter(getStarHTML(calculateStars(score)),
+            new Font("Segoe UI", Font.PLAIN, 22), ACCENT_COLOR);
 
-        // Points
-        lblPoints = makeCenter("💰 Points Earned: " + calculatePoints(score),
-            BODY_FONT, new Color(60, 100, 70));
+        // Points — emoji font so the coin icon renders
+        lblPoints = makeCenter("\uD83D\uDCB0 Points Earned: " + calculatePoints(score),
+            new Font("Segoe UI Emoji", Font.PLAIN, 14), new Color(60, 100, 70));
 
-        // Motivational message
+        // Motivational message — no emoji, plain font is fine
         lblMessage = makeCenter(getMotivationalMessage(score),
             new Font("Segoe UI", Font.ITALIC, 16), getMessageColor(score));
 
-        // User greeting
-        JLabel lblUser = makeCenter("Well done, " + username + "! 🎉", SMALL_FONT,
-            new Color(120, 160, 130));
+        // User greeting — emoji font so the party popper renders
+        JLabel lblUser = makeCenter("Well done, " + username + "! \uD83C\uDF89",
+            new Font("Segoe UI Emoji", Font.PLAIN, 11), new Color(120, 160, 130));
 
         card.add(Box.createVerticalStrut(8));
         card.add(lblScore);
@@ -154,31 +154,9 @@ public class RewardSystem extends JPanel implements ScoreStorage {
         JScrollPane scroll = new JScrollPane(leaderboardArea);
         scroll.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createLineBorder(PRIMARY_COLOR, 1, true),
-            "🏆 Leaderboard", 0, 0,
-            new Font("Segoe UI", Font.BOLD, 12), PRIMARY_COLOR));
+            "\uD83C\uDFC6 Leaderboard", 0, 0,
+            new Font("Segoe UI Emoji", Font.BOLD, 12), PRIMARY_COLOR));
         bottomPanel.add(scroll, BorderLayout.CENTER);
-
-        // Buttons row
-        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
-        btnRow.setBackground(BG_COLOR);
-
-        JButton btnRefresh = makeButton("📋 Leaderboard");
-        JButton btnClear   = makeButton("🗑️ Clear Scores");
-
-        btnRefresh.addActionListener(e -> displayLeaderboard());
-        btnClear.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                "Clear ALL scores? This cannot be undone.",
-                "Confirm Clear", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                clearScores();
-                leaderboardArea.setText("  Leaderboard cleared.");
-            }
-        });
-
-        btnRow.add(btnRefresh);
-        btnRow.add(btnClear);
-        bottomPanel.add(btnRow, BorderLayout.SOUTH);
 
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -190,11 +168,11 @@ public class RewardSystem extends JPanel implements ScoreStorage {
 
     /** Assign badge based on score percentage. */
     public String determineBadge(int score) {
-        if      (score >= 80) return "🏆 Gold Badge  —  Outstanding!";
-        else if (score >= 60) return "🥈 Silver Badge  —  That's good!";
-        else if (score >= 40) return "🥉 Bronze Badge  —  Good try!";
-        else if (score >= 20) return "🎗️ Iron Badge  —  You can do better!";
-        else                  return "🎖️ Participant Badge  —  Don't give up!";
+        if      (score >= 80) return "\uD83C\uDFC6 Gold Badge  —  Outstanding!";
+        else if (score >= 60) return "\uD83E\uDD48 Silver Badge  —  That's good!";
+        else if (score >= 40) return "\uD83E\uDD49 Bronze Badge  —  Good try!";
+        else if (score >= 20) return "\uD83C\uDF97 Iron Badge  —  You can do better!";
+        else                  return "\uD83C\uDF96 Participant Badge  —  Don't give up!";
     }
 
     /** Motivational message matching project rubric. */
@@ -231,8 +209,17 @@ public class RewardSystem extends JPanel implements ScoreStorage {
         else                  return 1;
     }
 
-    private String getStarString(int stars) {
-        return "★".repeat(stars) + "☆".repeat(5 - stars);
+    private String getStarHTML(int stars) {
+        StringBuilder sb = new StringBuilder("<html><center>");
+        for (int i = 0; i < 5; i++) {
+            if (i < stars) {
+                sb.append("<font color=\'#FFC107\'>\u2605</font>");  // gold filled star
+            } else {
+                sb.append("<font color=\'#CCCCCC\'>\u2605</font>");  // grey empty star
+            }
+        }
+        sb.append("</center></html>");
+        return sb.toString();
     }
 
     private Color getMessageColor(int score) {
