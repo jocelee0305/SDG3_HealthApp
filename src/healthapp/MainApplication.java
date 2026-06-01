@@ -1,13 +1,16 @@
 package healthapp;
  
 import javax.swing.*;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+
+// Class      : MainApplication
+// Creator    : Member 4
+// Tester     : Member 3
  
 public class MainApplication extends JFrame implements UserInteraction {
  
@@ -25,7 +28,7 @@ public class MainApplication extends JFrame implements UserInteraction {
     private static final String PANEL_LEADER   = "LEADERBOARD";
  
     public MainApplication() {
-        setTitle("HealthApp  —  SDG 3: Good Health & Well-being");
+        setTitle("HealthApp  \u2014  SDG 3: Good Health & Well-being");
         setSize(420, 750);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -36,7 +39,6 @@ public class MainApplication extends JFrame implements UserInteraction {
             public void windowClosing(WindowEvent e) { exitApplication(); }
         });
 
-        // build the top navigation bar
         buildTopNavBar();
 
         cardLayout = new CardLayout();
@@ -49,29 +51,25 @@ public class MainApplication extends JFrame implements UserInteraction {
         showWelcomeScreen();
     }
 
-    // build the persistent top navigation bar (hidden on welcome screen)
     private void buildTopNavBar() {
         topNavBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topNavBar.setBackground(new Color(20, 100, 60));
 
-        JButton btnHome = new JButton("🏠 Main Menu");
-        btnHome.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        JButton btnHome = new JButton("\u2302 Main Menu");
+        btnHome.setFont(new Font("Dialog", Font.BOLD, 12));
         btnHome.setBackground(new Color(240, 248, 245));
         btnHome.setForeground(new Color(40, 50, 45));
         btnHome.setFocusPainted(false);
-        btnHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        
         btnHome.setOpaque(true);
         btnHome.setContentAreaFilled(true);
-        btnHome.setBorderPainted(false); // Fix for Mac/Native themes
-        
+        btnHome.setBorderPainted(false);
+        btnHome.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnHome.addActionListener(e -> showMainMenu());
 
         topNavBar.add(btnHome);
         topNavBar.setVisible(false);
     }
  
-    // build the welcome/login screen
     private JPanel buildWelcomePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(BG_COLOR);
@@ -81,15 +79,14 @@ public class MainApplication extends JFrame implements UserInteraction {
         gbc.fill   = GridBagConstraints.HORIZONTAL;
         gbc.gridx  = 0;
  
-        // app icon
+        // app icon - original leaf
         JLabel lblIcon = new JLabel("🌿", SwingConstants.CENTER);
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 60));
-        lblIcon.setPreferredSize(new Dimension(100, 90));  
-        lblIcon.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0)); 
+        lblIcon.setPreferredSize(new Dimension(100, 90));
+        lblIcon.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         gbc.gridy = 0;
         panel.add(lblIcon, gbc);
  
-        // app title
         JLabel lblTitle = new JLabel(
             "<html><center><b>HealthApp</b><br/>"
             + "<span style='font-size:11px;'>SDG 3: Good Health & Well-being</span></center></html>",
@@ -99,22 +96,22 @@ public class MainApplication extends JFrame implements UserInteraction {
         gbc.gridy = 1;
         panel.add(lblTitle, gbc);
  
-        // subtitle
+        // Star and bullet - safe Unicode
         JLabel lblSub = new JLabel(
-            "<html><center>Learn  •  Quiz  •  Earn Rewards</center></html>",
+            "<html><center>\u2605 Learn  \u2022  \u2605 Quiz  \u2022  \u2605 Earn Rewards</center></html>",
             SwingConstants.CENTER);
         lblSub.setFont(new Font("Segoe UI", Font.ITALIC, 13));
         lblSub.setForeground(Color.GRAY);
         gbc.gridy = 2;
         panel.add(lblSub, gbc);
  
-        // name prompt
-        JLabel lblPrompt = new JLabel("Enter your name to begin:");
-        lblPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        // Right triangle - safe Unicode
+        JLabel lblPrompt = new JLabel("\u25B6  Enter your name to begin:");
+        lblPrompt.setFont(new Font("Dialog", Font.PLAIN, 13));
+        lblPrompt.setForeground(PRIMARY_COLOR);
         gbc.gridy = 3;
         panel.add(lblPrompt, gbc);
  
-        // name input field
         JTextField txtName = new JTextField();
         txtName.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         txtName.setBorder(BorderFactory.createCompoundBorder(
@@ -123,11 +120,11 @@ public class MainApplication extends JFrame implements UserInteraction {
         gbc.gridy = 4;
         panel.add(txtName, gbc);
  
-        // dashboard buttons with high contrast solid colors
-        JButton btnLearn  = styleButton("📘 Read Info", PRIMARY_COLOR, Color.WHITE);
-        JButton btnQuiz   = styleButton("📝 Take Quiz", new Color(0, 102, 204), Color.WHITE);
-        JButton btnLeader = styleButton("🏆 Leaderboard", new Color(230, 138, 0), Color.WHITE);
-        JButton btnExit   = styleButton("❌ Exit", new Color(204, 51, 51), Color.WHITE);
+        // Buttons with safe Unicode icons only - NO emoji
+        JButton btnLearn  = styleButton("\u2139 Read Info",   PRIMARY_COLOR,          Color.WHITE);
+        JButton btnQuiz   = styleButton("\u270E Take Quiz",   new Color(0, 102, 204), Color.WHITE);
+        JButton btnLeader = styleButton("\u2605 Leaderboard", new Color(230, 138, 0), Color.WHITE);
+        JButton btnExit   = styleButton("\u2716 Exit",        new Color(204, 51, 51), Color.WHITE);
 
         JPanel menuGrid = new JPanel(new GridLayout(4, 1, 0, 10));
         menuGrid.setBackground(BG_COLOR);
@@ -139,7 +136,6 @@ public class MainApplication extends JFrame implements UserInteraction {
         gbc.gridy = 5;
         panel.add(menuGrid, gbc);
  
-        // action: validate name then launch module
         btnLearn.addActionListener(e -> {
             if (validateUser(txtName.getText(), this)) {
                 setupModules();
@@ -168,7 +164,6 @@ public class MainApplication extends JFrame implements UserInteraction {
         return panel;
     }
 
-    // validate user input and create profile
     private boolean validateUser(String name, JFrame parent) {
         if (name.trim().isEmpty()) {
             JOptionPane.showMessageDialog(parent,
@@ -182,7 +177,6 @@ public class MainApplication extends JFrame implements UserInteraction {
         return true;
     }
 
-    // setup member 1 and member 2 modules
     private void setupModules() {
         LearningModule learningPanel = new LearningModule(currentUser, () -> {
             int ans = JOptionPane.showConfirmDialog(this,
@@ -199,14 +193,13 @@ public class MainApplication extends JFrame implements UserInteraction {
         mainPanel.add(quizPanel, PANEL_QUIZ);
     }
 
-    // read-only view of leaderboard
     private void showLeaderboardOnly() {
         JPanel leaderPanel = new JPanel(new BorderLayout(10, 10));
         leaderPanel.setBackground(BG_COLOR);
         leaderPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel title = new JLabel("Global Leaderboard 🏆", SwingConstants.CENTER);
-        title.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        JLabel title = new JLabel("\u2605 Global Leaderboard \u2605", SwingConstants.CENTER);
+        title.setFont(new Font("Dialog", Font.BOLD, 20));
         title.setForeground(PRIMARY_COLOR);
         leaderPanel.add(title, BorderLayout.NORTH);
 
@@ -222,7 +215,7 @@ public class MainApplication extends JFrame implements UserInteraction {
             boolean hasScores = false;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if(parts.length >= 2) {
+                if (parts.length >= 2) {
                     sb.append(String.format("%-20s %s%%\n", parts[0].trim(), parts[1].trim()));
                     hasScores = true;
                 }
@@ -242,25 +235,19 @@ public class MainApplication extends JFrame implements UserInteraction {
         navigateTo(PANEL_LEADER);
     }
 
-    // ui helper for buttons
     private JButton styleButton(String text, Color bg, Color fg) {
         JButton btn = new JButton(text);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setFont(new Font("Dialog", Font.BOLD, 14));
         btn.setBackground(bg);
         btn.setForeground(fg);
         btn.setFocusPainted(false);
-        
-        // Critical fix for Mac / Native Windows themes:
         btn.setOpaque(true);
         btn.setContentAreaFilled(true);
-        btn.setBorderPainted(false); // <--- This completely disables the OS override
-        
+        btn.setBorderPainted(false);
         btn.setBorder(new EmptyBorder(12, 10, 12, 10));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
- 
-    // --- UserInteraction interface methods ---
  
     @Override
     public void showMainMenu() {
@@ -286,22 +273,13 @@ public class MainApplication extends JFrame implements UserInteraction {
         if (confirm == JOptionPane.YES_OPTION) System.exit(0);
     }
  
-    // main entry point
     public static void main(String[] args) {
- 
-        // global exception handler
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
             JOptionPane.showMessageDialog(null,
                 "An unexpected error occurred:\n" + throwable.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
             throwable.printStackTrace();
         });
- 
-        // run on Swing Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            // REMOVED the UIManager.setLookAndFeel block so Java uses its 
-            // CrossPlatform UI which guarantees the button colors will show up.
-            new MainApplication().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new MainApplication().setVisible(true));
     }
 }
