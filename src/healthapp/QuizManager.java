@@ -6,10 +6,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-// Class: QuizManager
-// Creator: Lee Xing Ying
-// Tester: Member 3
-// OOP: Encapsulation, Polymorphism, Exception Handling, GUI
+// ============================================================
+// Class      : QuizManager
+// Creator    : Lee Xing Ying (104731)
+// Tester     : Member 3
+// OOP        : Encapsulation, Polymorphism, Exception Handling, GUI
+// Description: Manages 20 quiz questions, user interactions,
+//              answer validation, score calculation, and
+//              integration with RewardSystem.
+// ============================================================
 
 public class QuizManager extends JPanel {
 

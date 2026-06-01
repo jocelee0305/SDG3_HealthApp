@@ -1,9 +1,16 @@
 package healthapp;
 
-// Abstract Class: Question
-// Creator: Lee Xing Ying
-// Tester: Andrea
-// OOP: Abstration, Interface implementation
+// ============================================================
+// Abstract Class : Question
+// Creator        : Lee Xing Ying （104731）
+// Tester         : Andrea
+// OOP            : Abstraction, Inheritance
+// Description    : Serves as the parent class for all
+//                  question types. Defines common
+//                  attributes and behaviors while
+//                  enforcing answer validation through
+//                  the abstract checkAnswer() method.
+// ============================================================
 
 public abstract class Question implements QuestionHandler {
 

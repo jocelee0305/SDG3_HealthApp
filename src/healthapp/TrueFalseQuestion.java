@@ -1,9 +1,14 @@
 package healthapp;
 
-// Class: TrueFalseQuestion
-// Creator: Lee Xing Ying
-// Tester: Member 4
-// OOP: Inheritance, Overriding
+// ============================================================
+// Class       : TrueFalseQuestion
+// Creator     : Lee Xing Ying （104731）
+// Tester      : Member 4
+// OOP         : Inheritance, Method Overriding
+// Description : Represents a true/false question.
+//               Inherits from Question and overrides
+//               checkAnswer() to compare user responses.
+// ============================================================
 
 public class TrueFalseQuestion extends Question {
 

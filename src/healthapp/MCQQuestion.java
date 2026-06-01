@@ -1,9 +1,14 @@
 package healthapp;
 
-// Class: MCQQuestion
-// Creator: Lee Xing Ying
-// Tester: Member 4
-// OOP: Inheritance, Overriding
+// ============================================================
+// Class       : MCQQuestion
+// Creator     : Lee Xing Ying （104731）
+// Tester      : Member 4
+// OOP Concept : Inheritance, Method Overriding
+// Description : Represents a multiple-choice question.
+//               Stores answer options and overrides the
+//               checkAnswer() method to validate answers.
+// ============================================================
 
 public class MCQQuestion extends Question {
 
