@@ -20,10 +20,16 @@ public class MainApplication extends JFrame implements UserInteraction {
     private JPanel      topNavBar;
     private CardLayout  cardLayout;
 
+    // ── Process badge unlock state (tracked here so UserProfile needs no changes) ──
+    private boolean badgeKnowledgeSeeker = false;   // 📖 unlocked when Learning Module done
+    private boolean badgeFirstAttempt    = false;   // 🎯 unlocked when quiz first started
+    private boolean badgePerfectScore    = false;   // ⭐ unlocked when score == total questions
+
     private static final String PANEL_WELCOME  = "WELCOME";
     private static final String PANEL_LEARNING = "LEARNING";
     private static final String PANEL_QUIZ     = "QUIZ";
     private static final String PANEL_LEADER   = "LEADERBOARD";
+    private static final String PANEL_BADGES   = "BADGES";
 
     public MainApplication() {
         setTitle("HealthApp  \u2014  SDG 3: Good Health & Well-being");
@@ -48,6 +54,10 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         showWelcomeScreen();
     }
+
+    // ── Badge flag setters (called by QuizManager via window ancestor) ───────────
+    public void unlockFirstAttemptBadge()  { badgeFirstAttempt = true; }
+    public void unlockPerfectScoreBadge()  { badgePerfectScore = true; }
 
     private void buildTopNavBar() {
         topNavBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -121,15 +131,17 @@ public class MainApplication extends JFrame implements UserInteraction {
         // Buttons with safe Unicode icons only - NO emoji
         JButton btnLearn  = styleButton("\u2139 Read Info",   PRIMARY_COLOR,          Color.WHITE);
         JButton btnQuiz   = styleButton("\u270E Take Quiz",   new Color(0, 102, 204), Color.WHITE);
-        // \uD83C\uDFC6 = 🏆  (emoji font renders this correctly via HTML/Segoe UI Emoji)
         JButton btnLeader = styleButton("\u2605 Leaderboard", new Color(230, 138, 0), Color.WHITE);
+        // \uD83C\uDF96 = 🎖  My Badges button — purple theme
+        JButton btnBadges = styleButton("\uD83C\uDF96 My Badges", new Color(100, 60, 180), Color.WHITE);
         JButton btnExit   = styleButton("\u2716 Exit",        new Color(204, 51, 51), Color.WHITE);
 
-        JPanel menuGrid = new JPanel(new GridLayout(4, 1, 0, 10));
+        JPanel menuGrid = new JPanel(new GridLayout(5, 1, 0, 10));
         menuGrid.setBackground(BG_COLOR);
         menuGrid.add(btnLearn);
         menuGrid.add(btnQuiz);
         menuGrid.add(btnLeader);
+        menuGrid.add(btnBadges);
         menuGrid.add(btnExit);
 
         gbc.gridy = 5;
@@ -160,6 +172,7 @@ public class MainApplication extends JFrame implements UserInteraction {
         // Leaderboard button now delegates entirely to RewardSystem.displayLeaderboard()
         // to avoid duplicate file-reading logic
         btnLeader.addActionListener(e -> showLeaderboardOnly());
+        btnBadges.addActionListener(e -> showBadgesPanel(txtName.getText()));
         btnExit.addActionListener(e -> exitApplication());
 
         return panel;
@@ -181,6 +194,7 @@ public class MainApplication extends JFrame implements UserInteraction {
     private void setupModules() {
         LearningModule learningPanel = new LearningModule(currentUser, () -> {
             // \uD83D\uDCD6 Knowledge Seeker badge — fires when user finishes the Learning Module
+            badgeKnowledgeSeeker = true;
             BadgePopup.show(this, BadgePopup.KNOWLEDGE_SEEKER);
 
             int ans = JOptionPane.showConfirmDialog(this,
@@ -290,6 +304,139 @@ public class MainApplication extends JFrame implements UserInteraction {
         mainPanel.add(leaderWrapper, PANEL_LEADER);
         topNavBar.setVisible(true);
         navigateTo(PANEL_LEADER);
+    }
+
+    // ── Badges panel ──────────────────────────────────────────
+
+    /**
+     * Build and show the "My Badges" screen.
+     * Reads unlock state from UserProfile (or treats all as locked if no name entered).
+     * Triggered by the "\uD83C\uDF96 My Badges" button on the main menu.
+     */
+    private void showBadgesPanel(String nameInput) {
+        // Determine which badges are unlocked from local tracking fields
+        boolean hasKnowledge  = badgeKnowledgeSeeker;
+        boolean hasFirstTry   = badgeFirstAttempt;
+        boolean hasPerfect    = badgePerfectScore;
+        int unlockedCount     = (hasKnowledge ? 1 : 0) + (hasFirstTry ? 1 : 0) + (hasPerfect ? 1 : 0);
+
+        // ── Wrapper panel ─────────────────────────────────────
+        JPanel badgesWrapper = new JPanel(new BorderLayout(0, 0));
+        badgesWrapper.setBackground(BG_COLOR);
+
+        // ── Header bar ────────────────────────────────────────
+        JPanel header = new JPanel(new BorderLayout());
+        header.setBackground(new Color(20, 100, 60));
+        header.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        JLabel lblTitle = new JLabel("SDG 3: Good Health & Well-being  |  My Badges");
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lblTitle.setForeground(Color.WHITE);
+
+        // \uD83C\uDF96 = 🎖
+        JLabel lblCount = new JLabel(unlockedCount + " / 3 unlocked");
+        lblCount.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        lblCount.setForeground(new Color(184, 255, 218));
+
+        header.add(lblTitle, BorderLayout.WEST);
+        header.add(lblCount, BorderLayout.EAST);
+        badgesWrapper.add(header, BorderLayout.NORTH);
+
+        // ── Content area ──────────────────────────────────────
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.setBackground(Color.WHITE);
+        content.setBorder(BorderFactory.createEmptyBorder(16, 14, 16, 14));
+
+        JLabel lblSub = new JLabel("Complete activities to unlock all badges", SwingConstants.CENTER);
+        lblSub.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+        lblSub.setForeground(new Color(130, 140, 135));
+        lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        content.add(lblSub);
+        content.add(Box.createVerticalStrut(14));
+
+        // Badge rows: icon, name, description, unlocked?, accent colour
+        Object[][] badges = {
+            // \uD83D\uDCD6 = 📖
+            { "\uD83D\uDCD6", "Knowledge Seeker", "Complete the Learning Module",
+              hasKnowledge, new Color(34, 139, 87), new Color(240, 250, 244), new Color(163, 217, 184) },
+            // \uD83C\uDFAF = 🎯
+            { "\uD83C\uDFAF", "First Attempt",    "Start the quiz for the first time",
+              hasFirstTry,  new Color(24, 95, 165), new Color(234, 243, 251), new Color(163, 196, 232) },
+            // \u2B50 = ⭐
+            { "\u2B50",       "Perfect Score",     "Answer all questions correctly",
+              hasPerfect,   new Color(176, 122, 0), new Color(250, 245, 220), new Color(230, 190, 100) }
+        };
+
+        for (Object[] b : badges) {
+            String  icon      = (String)  b[0];
+            String  badgeName = (String)  b[1];
+            String  desc      = (String)  b[2];
+            boolean unlocked  = (Boolean) b[3];
+            Color   accent    = (Color)   b[4];
+            Color   rowBg     = unlocked ? (Color) b[5] : new Color(245, 245, 245);
+            Color   rowBorder = unlocked ? (Color) b[6] : new Color(210, 210, 210);
+
+            JPanel row = new JPanel(new BorderLayout(10, 0));
+            row.setBackground(rowBg);
+            row.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(rowBorder, 1, true),
+                BorderFactory.createEmptyBorder(10, 12, 10, 12)
+            ));
+            row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 64));
+
+            // Icon
+            JLabel lblIcon = new JLabel(icon);
+            lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, unlocked ? 30 : 28));
+            if (!unlocked) lblIcon.setForeground(new Color(180, 180, 180));
+            row.add(lblIcon, BorderLayout.WEST);
+
+            // Name + description
+            JPanel textCol = new JPanel();
+            textCol.setLayout(new BoxLayout(textCol, BoxLayout.Y_AXIS));
+            textCol.setBackground(rowBg);
+
+            JLabel lblName = new JLabel(badgeName);
+            lblName.setFont(new Font("Dialog", Font.BOLD, 13));
+            lblName.setForeground(unlocked ? new Color(accent.getRed() / 2, accent.getGreen() / 2, accent.getBlue() / 2)
+                                           : new Color(140, 140, 140));
+
+            JLabel lblDesc = new JLabel(desc);
+            lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+            lblDesc.setForeground(unlocked ? accent : new Color(170, 170, 170));
+
+            textCol.add(lblName);
+            textCol.add(Box.createVerticalStrut(2));
+            textCol.add(lblDesc);
+            row.add(textCol, BorderLayout.CENTER);
+
+            // Status pill
+            JLabel lblStatus = new JLabel(unlocked ? "Unlocked" : "Locked");
+            lblStatus.setFont(new Font("Dialog", Font.BOLD, 10));
+            lblStatus.setOpaque(true);
+            lblStatus.setBackground(unlocked ? accent : new Color(200, 200, 200));
+            lblStatus.setForeground(unlocked ? Color.WHITE : new Color(100, 100, 100));
+            lblStatus.setBorder(BorderFactory.createEmptyBorder(3, 8, 3, 8));
+            row.add(lblStatus, BorderLayout.EAST);
+
+            content.add(row);
+            content.add(Box.createVerticalStrut(10));
+        }
+
+        JScrollPane scroll = new JScrollPane(content);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(200, 230, 210), 1, true));
+        scroll.getViewport().setBackground(Color.WHITE);
+
+        JPanel centerWrap = new JPanel(new BorderLayout());
+        centerWrap.setBackground(BG_COLOR);
+        centerWrap.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        centerWrap.add(scroll, BorderLayout.CENTER);
+
+        badgesWrapper.add(centerWrap, BorderLayout.CENTER);
+
+        mainPanel.add(badgesWrapper, PANEL_BADGES);
+        topNavBar.setVisible(true);
+        navigateTo(PANEL_BADGES);
     }
 
     // ── Static helpers used by showLeaderboardOnly() ──────────

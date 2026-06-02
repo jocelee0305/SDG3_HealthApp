@@ -79,14 +79,16 @@ public class QuizManager extends JPanel {
         // \uD83C\uDFAF First Attempt badge — fires once when the quiz panel is first shown
         if (!firstAttemptShown) {
             firstAttemptShown = true;
-            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-            // Small delay so the quiz UI finishes rendering before the popup appears
-            new Timer(400, e -> {
+            Timer firstAttemptTimer = new Timer(400, e -> {
                 ((Timer) e.getSource()).stop();
-                BadgePopup.show(
-                    (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this),
-                    BadgePopup.FIRST_ATTEMPT);
-            }) {{ setRepeats(false); start(); }};
+                JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this);
+                if (parent instanceof MainApplication) {
+                    ((MainApplication) parent).unlockFirstAttemptBadge();
+                }
+                BadgePopup.show(parent, BadgePopup.FIRST_ATTEMPT);
+            });
+            firstAttemptTimer.setRepeats(false);
+            firstAttemptTimer.start();
         }
     }
 
@@ -530,12 +532,16 @@ public class QuizManager extends JPanel {
 
         // \u2B50 Perfect Score badge — fires only when user answers all questions correctly
         if (score == questions.size()) {
-            new Timer(600, e -> {
+            Timer perfectTimer = new Timer(600, e -> {
                 ((Timer) e.getSource()).stop();
-                BadgePopup.show(
-                    (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this),
-                    BadgePopup.PERFECT_SCORE);
-            }) {{ setRepeats(false); start(); }};
+                JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this);
+                if (parent instanceof MainApplication) {
+                    ((MainApplication) parent).unlockPerfectScoreBadge();
+                }
+                BadgePopup.show(parent, BadgePopup.PERFECT_SCORE);
+            });
+            perfectTimer.setRepeats(false);
+            perfectTimer.start();
         }
     }
 
