@@ -25,11 +25,16 @@ public class MainApplication extends JFrame implements UserInteraction {
     private boolean badgeFirstAttempt    = false;   // 🎯 unlocked when quiz first started
     private boolean badgePerfectScore    = false;   // ⭐ unlocked when score == total questions
 
+    private static final String PANEL_SPLASH   = "SPLASH";
     private static final String PANEL_WELCOME  = "WELCOME";
     private static final String PANEL_LEARNING = "LEARNING";
     private static final String PANEL_QUIZ     = "QUIZ";
     private static final String PANEL_LEADER   = "LEADERBOARD";
     private static final String PANEL_BADGES   = "BADGES";
+    private static final String PANEL_SHUTDOWN = "SHUTDOWN";
+
+    // Variable to hold the shutdown GIF in memory
+    private Image shutdownImg;
 
     public MainApplication() {
         setTitle("HealthApp  \u2014  SDG 3: Good Health & Well-being");
@@ -37,6 +42,16 @@ public class MainApplication extends JFrame implements UserInteraction {
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
+
+        // Pre-load the shutdown GIF in a background thread so it doesn't freeze the app
+        new Thread(() -> {
+            java.net.URL shutURL = getClass().getResource("shutdown.gif");
+            if (shutURL != null) {
+                shutdownImg = new ImageIcon(shutURL).getImage();
+            } else {
+                System.err.println("Note: Could not find shutdown.gif. Showing solid color on exit.");
+            }
+        }).start();
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -47,7 +62,10 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         cardLayout = new CardLayout();
         mainPanel  = new JPanel(cardLayout);
+        
+        mainPanel.add(buildSplashPanel(), PANEL_SPLASH);
         mainPanel.add(buildWelcomePanel(), PANEL_WELCOME);
+        mainPanel.add(buildShutdownPanel(), PANEL_SHUTDOWN);
 
         add(topNavBar, BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
@@ -76,6 +94,118 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         topNavBar.add(btnHome);
         topNavBar.setVisible(false);
+    }
+
+    // --- SPLASH SCREEN WITH AUTO-SCALING GIF BACKGROUND ---
+    private JPanel buildSplashPanel() {
+        java.net.URL imgURL = getClass().getResource("FirstBackground.gif");
+        Image bgImage = null;
+        if (imgURL != null) {
+            bgImage = new ImageIcon(imgURL).getImage();
+        } else {
+            System.err.println("Note: Could not find FirstBackground.gif. Showing solid color.");
+        }
+
+        final Image finalBgImage = bgImage;
+
+        // Custom JPanel that stretches the background image to fit
+        JPanel backgroundPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (finalBgImage != null) {
+                    g.drawImage(finalBgImage, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    setBackground(PRIMARY_COLOR);
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+
+        backgroundPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
+
+        JLabel lblIcon = new JLabel("🌿", SwingConstants.CENTER);
+        lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 80));
+        gbc.gridy = 0;
+        backgroundPanel.add(lblIcon, gbc);
+
+        JLabel lblTitle = new JLabel("HealthApp");
+        lblTitle.setFont(new Font("Dialog", Font.BOLD, 38));
+        lblTitle.setForeground(Color.WHITE);
+        gbc.gridy = 1;
+        backgroundPanel.add(lblTitle, gbc);
+
+        JLabel lblWelcome = new JLabel("Welcome");
+        lblWelcome.setFont(new Font("Dialog", Font.ITALIC, 24));
+        lblWelcome.setForeground(new Color(220, 245, 230));
+        gbc.gridy = 2;
+        backgroundPanel.add(lblWelcome, gbc);
+
+        JLabel lblPrompt = new JLabel("\u25B6 Click anywhere to start \u25C0");
+        lblPrompt.setFont(new Font("Dialog", Font.BOLD, 14));
+        lblPrompt.setForeground(new Color(255, 215, 0));
+        gbc.gridy = 3;
+        gbc.insets = new Insets(80, 10, 10, 10);
+        backgroundPanel.add(lblPrompt, gbc);
+
+        // Click to proceed to Welcome Screen
+        MouseAdapter clickToStart = new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                navigateTo(PANEL_WELCOME);
+            }
+        };
+
+        backgroundPanel.addMouseListener(clickToStart);
+        lblIcon.addMouseListener(clickToStart);
+        lblTitle.addMouseListener(clickToStart);
+        lblWelcome.addMouseListener(clickToStart);
+        lblPrompt.addMouseListener(clickToStart);
+
+        return backgroundPanel;
+    }
+
+    // --- SHUTDOWN SCREEN WITH AUTO-SCALING GIF BACKGROUND ---
+    private JPanel buildShutdownPanel() {
+        JPanel backgroundPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (shutdownImg != null) {
+                    g.drawImage(shutdownImg, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    setBackground(PRIMARY_COLOR);
+                    g.fillRect(0, 0, getWidth(), getHeight());
+                }
+            }
+        };
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
+
+        JLabel lblIcon = new JLabel("🌿", SwingConstants.CENTER);
+        lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 80));
+        gbc.gridy = 0;
+        backgroundPanel.add(lblIcon, gbc);
+
+        JLabel lblTitle = new JLabel("HealthApp");
+        lblTitle.setFont(new Font("Dialog", Font.BOLD, 38));
+        lblTitle.setForeground(Color.WHITE);
+        gbc.gridy = 1;
+        backgroundPanel.add(lblTitle, gbc);
+
+        JLabel lblGoodbye = new JLabel("Goodbye...");
+        lblGoodbye.setFont(new Font("Dialog", Font.ITALIC, 24));
+        lblGoodbye.setForeground(new Color(220, 245, 230));
+        gbc.gridy = 2;
+        backgroundPanel.add(lblGoodbye, gbc);
+
+        return backgroundPanel;
     }
 
     private JPanel buildWelcomePanel() {
@@ -532,7 +662,8 @@ public class MainApplication extends JFrame implements UserInteraction {
 
     @Override
     public void showWelcomeScreen() {
-        showMainMenu();
+        topNavBar.setVisible(false);
+        cardLayout.show(mainPanel, PANEL_SPLASH);
     }
 
     @Override
@@ -540,7 +671,15 @@ public class MainApplication extends JFrame implements UserInteraction {
         int confirm = JOptionPane.showConfirmDialog(this,
             "Are you sure you want to exit?", "Exit",
             JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) System.exit(0);
+            
+        if (confirm == JOptionPane.YES_OPTION) {
+            topNavBar.setVisible(false);
+            cardLayout.show(mainPanel, PANEL_SHUTDOWN);
+            
+            Timer shutdownTimer = new Timer(3000, e -> System.exit(0));
+            shutdownTimer.setRepeats(false);
+            shutdownTimer.start();
+        }
     }
 
     public static void main(String[] args) {
