@@ -36,6 +36,28 @@ public class MainApplication extends JFrame implements UserInteraction {
     // Variable to hold the shutdown GIF in memory
     private Image shutdownImg;
 
+    // Helper to locate resources robustly regardless of working directory/classpath layout
+    private java.net.URL findResource(String name) {
+        String[] candidates = new String[] {
+            "/" + name,
+            "/healthapp/" + name,
+            name,
+            "healthapp/" + name
+        };
+        for (String cand : candidates) {
+            try {
+                java.net.URL u = getClass().getResource(cand);
+                if (u != null) return u;
+            } catch (Exception ignored) {}
+            try {
+                String clPath = cand.startsWith("/") ? cand.substring(1) : cand;
+                java.net.URL u2 = Thread.currentThread().getContextClassLoader().getResource(clPath);
+                if (u2 != null) return u2;
+            } catch (Exception ignored) {}
+        }
+        return null;
+    }
+
     public MainApplication() {
         setTitle("HealthApp  \u2014  SDG 3: Good Health & Well-being");
         setSize(420, 750);
@@ -45,7 +67,7 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         // Pre-load the shutdown GIF in a background thread so it doesn't freeze the app
         new Thread(() -> {
-            java.net.URL shutURL = getClass().getResource("shutdown.gif");
+            java.net.URL shutURL = findResource("shutdown.gif");
             if (shutURL != null) {
                 shutdownImg = new ImageIcon(shutURL).getImage();
             } else {
@@ -98,7 +120,7 @@ public class MainApplication extends JFrame implements UserInteraction {
 
     // --- SPLASH SCREEN WITH AUTO-SCALING GIF BACKGROUND ---
     private JPanel buildSplashPanel() {
-        java.net.URL imgURL = getClass().getResource("FirstBackground.gif");
+        java.net.URL imgURL = findResource("FirstBackground.gif");
         Image bgImage = null;
         if (imgURL != null) {
             bgImage = new ImageIcon(imgURL).getImage();
