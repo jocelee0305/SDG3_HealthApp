@@ -33,9 +33,16 @@ public class QuizManager extends JPanel {
     private int currentQuestionIndex = 0;
     private int score = 0;
 
+    // ── Timer fields ──────────────────────────────────────────
+    private static final int SECONDS_PER_QUESTION = 30;  // 每题时限
+    private int   secondsLeft;                            // 当前题目剩余秒数
+    private int   totalTimeBonusSeconds = 0;              // 累计所有题目的剩余秒数
+    private Timer questionTimer;                          // javax.swing.Timer
+
     // GUI Components
     private JLabel       lblModuleTitle;
     private JLabel       lblPageCounter;
+    private JLabel       lblTimer;                        // 倒计时 label
     private JProgressBar progressBar;
 
     private JPanel       cardPanel;
@@ -53,6 +60,9 @@ public class QuizManager extends JPanel {
     // Navigation
     private JButton      btnNext;
 
+    // ── Process badge tracking ────────────────────────────────
+    private boolean firstAttemptShown = false;  // true once First Attempt badge has fired
+
     //Constructor
     public QuizManager(UserProfile userProfile) {
         this.userProfile = userProfile;
@@ -65,6 +75,19 @@ public class QuizManager extends JPanel {
         buildCard();
         buildNav();
         showQuestion();
+
+        // \uD83C\uDFAF First Attempt badge — fires once when the quiz panel is first shown
+        if (!firstAttemptShown) {
+            firstAttemptShown = true;
+            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+            // Small delay so the quiz UI finishes rendering before the popup appears
+            new Timer(400, e -> {
+                ((Timer) e.getSource()).stop();
+                BadgePopup.show(
+                    (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this),
+                    BadgePopup.FIRST_ATTEMPT);
+            }) {{ setRepeats(false); start(); }};
+        }
     }
 
     //Question Loading (20 questions: 10 MCQ + 5 True/False + 5 Fill-Blank)
@@ -182,8 +205,19 @@ public class QuizManager extends JPanel {
         lblPageCounter.setForeground(new Color(200, 255, 220));
         lblPageCounter.setHorizontalAlignment(SwingConstants.RIGHT);
 
+        // \u23F1 = ⏱  Timer label — starts green, turns red in last 10 seconds
+        lblTimer = new JLabel("\u23F1 30s", SwingConstants.CENTER);
+        lblTimer.setFont(new Font("Dialog", Font.BOLD, 14));
+        lblTimer.setForeground(new Color(200, 255, 200));
+        lblTimer.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        rightPanel.setBackground(PRIMARY_COLOR);
+        rightPanel.add(lblTimer);
+        rightPanel.add(lblPageCounter);
+
         topPanel.add(lblModuleTitle, BorderLayout.WEST);
-        topPanel.add(lblPageCounter, BorderLayout.EAST);
+        topPanel.add(rightPanel,     BorderLayout.EAST);
 
         progressBar = new JProgressBar(0, questions.size());
         progressBar.setValue(1);
@@ -368,10 +402,19 @@ public class QuizManager extends JPanel {
 
         cardPanel.revalidate();
         cardPanel.repaint();
+
+        // Start the 30-second countdown for this question
+        startQuestionTimer();
     }
 
     // Validates user input and processes answer
     private void processAnswer() {
+        // Stop the timer and bank remaining seconds as time bonus
+        if (questionTimer != null && questionTimer.isRunning()) {
+            questionTimer.stop();
+            totalTimeBonusSeconds += secondsLeft;
+        }
+
         try {
             Question q = questions.get(currentQuestionIndex);
             String answer = null;
@@ -406,19 +449,94 @@ public class QuizManager extends JPanel {
         }
     }
 
+    // ── Timer Logic ───────────────────────────────────────────
+
+    /**
+     * Starts a 30-second countdown for the current question.
+     * Stops any existing timer first to prevent overlap.
+     * When time runs out, auto-advances without adding a bonus.
+     */
+    private void startQuestionTimer() {
+        // Stop previous timer if still running (e.g. user clicked Next very fast)
+        if (questionTimer != null && questionTimer.isRunning()) {
+            questionTimer.stop();
+        }
+
+        secondsLeft = SECONDS_PER_QUESTION;
+        updateTimerLabel();
+
+        questionTimer = new Timer(1000, e -> {
+            secondsLeft--;
+            updateTimerLabel();
+
+            if (secondsLeft <= 0) {
+                questionTimer.stop();
+                handleTimeout();
+            }
+        });
+        questionTimer.start();
+    }
+
+    /**
+     * Updates the timer label text and colour.
+     * Green when time is plentiful, red in the last 10 seconds.
+     */
+    private void updateTimerLabel() {
+        // \u23F1 = ⏱
+        lblTimer.setText("\u23F1 " + secondsLeft + "s  ");
+        if (secondsLeft <= 10) {
+            lblTimer.setForeground(new Color(255, 160, 160));   // light red warning
+        } else {
+            lblTimer.setForeground(new Color(200, 255, 200));   // normal light green
+        }
+    }
+
+    /**
+     * Called when the 30-second limit expires.
+     * No time bonus is added (secondsLeft is 0).
+     * Automatically advances to the next question or shows results.
+     */
+    private void handleTimeout() {
+        // No bonus — time ran out (totalTimeBonusSeconds += 0 implicitly)
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.size()) {
+            showQuestion();
+            if (currentQuestionIndex == questions.size() - 1)
+                btnNext.setText("Finish Quiz");
+        } else {
+            showResult();
+        }
+    }
+
     // Displays the final quiz result using RewardSystem (Member 3)
     private void showResult() {
+        // Ensure timer is stopped before leaving quiz screen
+        if (questionTimer != null && questionTimer.isRunning()) {
+            questionTimer.stop();
+        }
+
         removeAll();
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
         // ── Hand off to Member 3's RewardSystem ──────────────
         // RewardSystem handles: badge, stars, points, leaderboard, file save
-        RewardSystem rewardPanel = new RewardSystem(userProfile, score, questions.size());
+        // totalTimeBonusSeconds = sum of remaining seconds across all questions
+        RewardSystem rewardPanel = new RewardSystem(userProfile, score, questions.size(), totalTimeBonusSeconds);
         add(rewardPanel, BorderLayout.CENTER);
 
         revalidate();
         repaint();
+
+        // \u2B50 Perfect Score badge — fires only when user answers all questions correctly
+        if (score == questions.size()) {
+            new Timer(600, e -> {
+                ((Timer) e.getSource()).stop();
+                BadgePopup.show(
+                    (JFrame) SwingUtilities.getWindowAncestor(QuizManager.this),
+                    BadgePopup.PERFECT_SCORE);
+            }) {{ setRepeats(false); start(); }};
+        }
     }
 
 }
