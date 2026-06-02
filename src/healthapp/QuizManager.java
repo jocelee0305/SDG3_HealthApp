@@ -9,7 +9,7 @@ import java.util.ArrayList;
 // ============================================================
 // Class      : QuizManager
 // Creator    : Lee Xing Ying (104731)
-// Tester     : Member 3
+// Tester     : Jocelyn (104561)
 // OOP        : Encapsulation, Polymorphism, Exception Handling, GUI
 // Description: Manages 20 quiz questions, user interactions,
 //              answer validation, score calculation, and
@@ -34,15 +34,15 @@ public class QuizManager extends JPanel {
     private int score = 0;
 
     // ── Timer fields ──────────────────────────────────────────
-    private static final int SECONDS_PER_QUESTION = 30;  // 每题时限
-    private int   secondsLeft;                            // 当前题目剩余秒数
-    private int   totalTimeBonusSeconds = 0;              // 累计所有题目的剩余秒数
-    private Timer questionTimer;                          // javax.swing.Timer
+    private static final int SECONDS_PER_QUESTION = 30;  
+    private int   secondsLeft;                           
+    private int   totalTimeBonusSeconds = 0;             
+    private Timer questionTimer;                         
 
     // GUI Components
     private JLabel       lblModuleTitle;
     private JLabel       lblPageCounter;
-    private JLabel       lblTimer;                        // 倒计时 label
+    private JLabel       lblTimer;                        
     private JProgressBar progressBar;
 
     private JPanel       cardPanel;
@@ -510,7 +510,7 @@ public class QuizManager extends JPanel {
         }
     }
 
-    // Displays the final quiz result using RewardSystem (Member 3)
+    // Displays the final quiz result using RewardSystem (Jocelyn (104561))
     private void showResult() {
         // Ensure timer is stopped before leaving quiz screen
         if (questionTimer != null && questionTimer.isRunning()) {
@@ -521,7 +521,7 @@ public class QuizManager extends JPanel {
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
-        // ── Hand off to Member 3's RewardSystem ──────────────
+        // ── Hand off to Jocelyn (104561)'s RewardSystem ──────────────
         // RewardSystem handles: badge, stars, points, leaderboard, file save
         // totalTimeBonusSeconds = sum of remaining seconds across all questions
         RewardSystem rewardPanel = new RewardSystem(userProfile, score, questions.size(), totalTimeBonusSeconds);

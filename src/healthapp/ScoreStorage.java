@@ -3,7 +3,7 @@ package healthapp;
 // ============================================================
 // Interface  : ScoreStorage
 // Creator    : Jocelyn (104561)
-// Tester     : 
+// Tester     : Lee Xing Ying (104731)
 // Description: Defines the contract for saving, loading, and
 //              displaying user scores for the HealthApp.
 // ============================================================

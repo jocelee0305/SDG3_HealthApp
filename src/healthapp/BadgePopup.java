@@ -7,6 +7,7 @@ import java.awt.event.*;
 
 // ============================================================
 // Class      : BadgePopup
+// Creator    : Jocelyn (104561)
 // Description: Reusable glass-overlay popup for process badges.
 //              Shows a darkened background with a centred card
 //              containing the badge icon, name, description, and

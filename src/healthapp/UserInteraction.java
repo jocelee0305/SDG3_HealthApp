@@ -2,7 +2,7 @@ package healthapp;
 
 // Interface: UserInteraction
 // Creator: Member 4
-// Tester: Member 3
+// Tester: Jocelyn (104561)
 
 public interface UserInteraction {
     void showMainMenu();
