@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 // Class      : MainApplication
-// Creator    : Member 4
+// Creator    : Muhammad Izzat (105244)
 // Tester     : Jocelyn (104561)
 
 public class MainApplication extends JFrame implements UserInteraction {

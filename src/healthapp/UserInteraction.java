@@ -1,7 +1,7 @@
 package healthapp;
 
 // Interface: UserInteraction
-// Creator: Member 4
+// Creator: Muhammad Izzat (105244)
 // Tester: Jocelyn (104561)
 
 public interface UserInteraction {

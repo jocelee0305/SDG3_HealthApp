@@ -2,7 +2,7 @@ package healthapp;
 
 // Class: UserProfile
 // Creator: Andrea (Member 1)
-// Tester: Member 4
+// Tester: Muhammad Izzat (105244)
 // OOP: Encapsulation
 
 public class UserProfile {

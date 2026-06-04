@@ -3,7 +3,7 @@ package healthapp;
 // ============================================================
 // Class       : TrueFalseQuestion
 // Creator     : Lee Xing Ying （104731）
-// Tester      : Member 4
+// Tester      : Muhammad Izzat (105244)
 // OOP         : Inheritance, Method Overriding
 // Description : Represents a true/false question.
 //               Inherits from Question and overrides

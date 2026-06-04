@@ -3,7 +3,7 @@ package healthapp;
 // ============================================================
 // Class       : FillBlankQuestion
 // Creator     : Lee Xing Ying (104731)
-// Tester      : Member 4
+// Tester      : Muhammad Izzat (105244)
 // OOP         : Inheritance, Overriding
 // Description : Represents a fill-in-the-blank question.
 //               Inherits attributes and methods from the
