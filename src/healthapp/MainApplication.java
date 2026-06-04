@@ -6,9 +6,15 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.*;
 
-// Class      : MainApplication
-// Creator    : Muhammad Izzat (105244)
-// Tester     : Jocelyn (104561)
+// ============================================================
+// Class       : MainApplication
+// Creator     : Muhammad Izzat (105244)
+// Tester      : Jocelyn (104561)
+// OOP         : Inheritance, Interfaces, Encapsulation
+// Description : Serves as the main GUI container for HealthApp.
+//               Inherits from JFrame and implements UserInteraction
+//               to manage navigation, screen rendering, and badge states.
+// ============================================================
 
 public class MainApplication extends JFrame implements UserInteraction {
 
