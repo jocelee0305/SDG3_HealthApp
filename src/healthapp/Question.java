@@ -3,7 +3,7 @@ package healthapp;
 // ============================================================
 // Abstract Class : Question
 // Creator        : Lee Xing Ying （104731）
-// Tester         : Andrea
+// Tester         : Andrea Nguang (103324)
 // OOP            : Abstraction, Inheritance
 // Description    : Serves as the parent class for all
 //                  question types. Defines common

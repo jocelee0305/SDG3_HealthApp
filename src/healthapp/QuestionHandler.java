@@ -3,7 +3,7 @@ package healthapp;
 // ============================================================
 // Interface  : QuestionHandler
 // Creator    : Lee Xing Ying (104731)
-// Tester     : Andrea
+// Tester     : Andrea Nguang (103324)
 // Description: Defines the contract for displaying quiz
 //              questions and validating user answers in
 //              the HealthApp quiz module.

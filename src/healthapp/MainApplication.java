@@ -152,6 +152,8 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         JLabel lblIcon = new JLabel("🌿", SwingConstants.CENTER);
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 80));
+        lblIcon.setPreferredSize(new Dimension(120, 110));
+        lblIcon.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         gbc.gridy = 0;
         backgroundPanel.add(lblIcon, gbc);
 
@@ -212,6 +214,8 @@ public class MainApplication extends JFrame implements UserInteraction {
 
         JLabel lblIcon = new JLabel("🌿", SwingConstants.CENTER);
         lblIcon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 80));
+        lblIcon.setPreferredSize(new Dimension(120, 110));
+        lblIcon.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         gbc.gridy = 0;
         backgroundPanel.add(lblIcon, gbc);
 

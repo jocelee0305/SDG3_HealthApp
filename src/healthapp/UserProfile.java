@@ -1,7 +1,7 @@
 package healthapp;
 
 // Class: UserProfile
-// Creator: Andrea (Member 1)
+// Creator: Andrea Nguang (103324)
 // Tester: Muhammad Izzat (105244)
 // OOP: Encapsulation
 

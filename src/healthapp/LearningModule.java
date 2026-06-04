@@ -1,5 +1,10 @@
 package healthapp;
- 
+
+// Class      : LearningModule
+// Creator    : Andrea Nguang (103324)
+// Tester     : Muhammad Izzat (105244)
+// OOP        : GUI Layout Design, Encapsulation
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;

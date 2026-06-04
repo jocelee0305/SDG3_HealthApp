@@ -1,7 +1,7 @@
 package healthapp;
 
 // Interface: ContentDisplay
-// Creator: Andrea (Member 1)
+// Creator: Andrea Nguang (103324)
 // Tester: Muhammad Izzat (105244)
 
 public interface ContentDisplay {
