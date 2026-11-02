@@ -45,8 +45,10 @@ public class MainApplication extends JFrame implements UserInteraction {
     // Helper to locate resources robustly regardless of working directory/classpath layout
     private java.net.URL findResource(String name) {
         String[] candidates = new String[] {
+            "/resources/" + name,
             "/" + name,
             "/healthapp/" + name,
+            "resources/" + name,
             name,
             "healthapp/" + name
         };
